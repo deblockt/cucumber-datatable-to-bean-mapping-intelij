@@ -25,13 +25,40 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: buildPlugin
+        run: ./gradlew buildPlugin
 
-      - name: add artifact to release
-        uses: actions/upload-artifact@v4
+      - name: Get the latest release
+        id: get_latest_release
+        uses: actions/github-script@v7
         with:
-          path: ./build/distribution/cucumber-datatable-to-bean-mapping-intelij-plugin-1.0-SNAPSHOT.zip
-          name: cucumber-datatable-to-bean-mapping-intelij-plugin.zip
-          if-no-files-found: error
+          script: |
+            const latestRelease = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            return latestRelease.data.id;
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact to latest release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const artifactPath = 'build/distributions/cucumber-datatable-to-bean-mapping-intelij-plugin-1.0-SNAPSHOT.zip';
+            const releaseId = ${{ steps.get_latest_release.outputs.result }};
+            
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: releaseId,
+              name: 'cucumber-datatable-to-bean-mapping-intelij-plugin.zip',
+              data: fs.readFileSync(artifactPath),
+              headers: {
+                'content-type': 'application/octet-stream',
+                'content-length': fs.statSync(artifactPath).size,
+              },
+            });
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

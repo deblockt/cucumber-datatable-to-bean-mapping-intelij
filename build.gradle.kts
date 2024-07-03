@@ -2,10 +2,26 @@ plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.9.21"
     id("org.jetbrains.intellij") version "1.16.1"
+    id("me.qoomon.git-versioning") version "6.3.6"
 }
 
 group = "io.github.deblockt"
-version = "1.0-SNAPSHOT"
+version = ""
+gitVersioning.apply {
+    refs {
+        branch(".+") {
+            version = "\${ref}-SNAPSHOT"
+        }
+        tag("v(?<version>.*)") {
+            version = "\${ref.version}"
+        }
+    }
+
+    // optional fallback configuration in case of no matching ref configuration
+    rev {
+        version = "\${commit}"
+    }
+}
 
 repositories {
     mavenCentral()

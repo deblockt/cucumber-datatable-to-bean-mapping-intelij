@@ -14,7 +14,7 @@ class HeaderAnnotator: Annotator {
         val fields = datatableFields(element)
         val headerContent = element.text.trim()
         val numberOfMatch = fields
-                .flatMap { fieldNames(it).asIterable() }
+                .flatMap { it.name }
                 .count { it == headerContent }
         if (numberOfMatch == 0) {
             holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved header name")

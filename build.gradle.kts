@@ -24,6 +24,11 @@ intellij {
     ))
 }
 
+dependencies {
+    implementation("io.github.deblockt:cucumber-datatable-to-bean-mapping:1.1.0")
+    implementation("io.cucumber:cucumber-core:7.8.1")
+}
+
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {

@@ -16,11 +16,11 @@ import com.intellij.util.ProcessingContext
 class HeaderColumnReferenceProvider: PsiReferenceProvider() {
     override fun getReferencesByElement(element: PsiElement, context: ProcessingContext): Array<PsiReference> {
         val matchingField = datatableFields(element)
-                .filter { fieldNames(it).contains(element.text) }
+                .filter { it.name.contains(element.text) }
         if (matchingField.isNotEmpty()) {
             val range = TextRange(0, element.text.length)
             return arrayOf(
-                    MyVariantReference(element, range, matchingField[0])
+                    MyVariantReference(element, range, matchingField[0].psiField)
             )
         }
         return PsiReference.EMPTY_ARRAY

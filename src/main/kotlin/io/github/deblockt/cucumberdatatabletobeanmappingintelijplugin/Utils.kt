@@ -61,25 +61,32 @@ fun fieldInfo(field: PsiField): FieldInfo {
     )
 }
 
-fun datatableFields(element: PsiElement): List<DataTablePsiField> {
+fun datatableClass(element: PsiElement): PsiClass? {
     val step = PsiTreeUtil.getParentOfType(element,org.jetbrains.plugins.cucumber.psi.impl.GherkinStepImpl::class.java)
-            ?: return emptyList();
+            ?: return null;
     val reference = step.references[0] as PsiPolyVariantReference
     val results = reference.multiResolve(true)
     if (results.isEmpty()) {
-        return emptyList()
+        return null
     }
     val methodRef = results[0].element
     val parameters = PsiTreeUtil.findChildOfType(methodRef, PsiParameterList::class.java)
     val lastParameter = PsiTreeUtil.getChildrenOfType(parameters, PsiParameter::class.java)?.last()
     val lastParameterType = PsiTreeUtil.findChildOfType(lastParameter, PsiTypeElement::class.java)
-    val paramterizedType = PsiTreeUtil.findChildOfType(lastParameterType, PsiReferenceParameterList::class.java) ?: return emptyList();
-    val elementType = if (paramterizedType.typeArguments.isEmpty()) {
+    val paramterizedType = PsiTreeUtil.findChildOfType(lastParameterType, PsiReferenceParameterList::class.java) ?: return null;
+    val clazz = if (paramterizedType.typeArguments.isEmpty()) {
         lastParameterType?.type as PsiClassReferenceType
     } else {
         paramterizedType.typeArguments.first() as PsiClassReferenceType
     }
-    return if (elementType.resolve() == null) emptyList() else datatableFields(elementType.resolve()!!, ColumnName())
+    if (clazz.resolve() != null && hasDataTableWithHeaderAnnotation(clazz.resolve()!!)) {
+        return clazz.resolve()
+    }
+    return null
+}
+fun datatableFields(element: PsiElement): List<DataTablePsiField> {
+    val elementType = datatableClass(element)
+    return if (elementType == null) emptyList() else datatableFields(elementType, ColumnName())
 }
 
 fun datatableFields(classField: PsiClass, parentName: ColumnName): List<DataTablePsiField> {

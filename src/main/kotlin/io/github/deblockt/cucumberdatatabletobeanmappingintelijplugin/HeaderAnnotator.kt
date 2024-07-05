@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement
 
 class HeaderAnnotator: Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
-        if (!IS_HEADER_CELL.accepts(element)) {
+        if (!IS_HEADER_CELL.accepts(element) || datatableClass(element) == null) {
             return;
         }
         val fields = datatableFields(element)

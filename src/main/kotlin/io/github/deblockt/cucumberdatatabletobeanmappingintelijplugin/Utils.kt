@@ -1,13 +1,17 @@
 package io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin
 
 import com.deblock.cucumber.datatable.annotations.Column
+import com.deblock.cucumber.datatable.annotations.CustomDatatableFieldMapper
 import com.deblock.cucumber.datatable.annotations.DataTableWithHeader
 import com.deblock.cucumber.datatable.annotations.Ignore
 import com.deblock.cucumber.datatable.mapper.datatable.ColumnName
 import com.deblock.cucumber.datatable.mapper.datatable.FieldResolver.FieldInfo
 import com.deblock.cucumber.datatable.mapper.datatable.fieldresolvers.ImplicitFieldResolver
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.PsiClassReferenceType
+import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.psi.util.PsiTreeUtil
 import kotlin.reflect.KClass
 
@@ -25,7 +29,7 @@ fun hasDataTableWithHeaderAnnotation(classField: PsiClass): Boolean {
             .count { it.qualifiedName == DataTableWithHeader::class.qualifiedName } > 0
 }
 
-fun annotationParamValue(field: PsiField, type: KClass<out Any>, paramName: String, isDefaultParam: Boolean = false): List<String> {
+fun annotationParamValue(field: PsiJvmModifiersOwner, type: KClass<out Any>, paramName: String, isDefaultParam: Boolean = false): List<String> {
     return field.annotations
             .asSequence()
             .filter { it.qualifiedName == type.qualifiedName }
@@ -86,25 +90,47 @@ fun datatableClass(element: PsiElement): PsiClass? {
 }
 fun datatableFields(element: PsiElement): List<DataTablePsiField> {
     val elementType = datatableClass(element)
-    return if (elementType == null) emptyList() else datatableFields(elementType, ColumnName())
+    val module = ProjectRootManager.getInstance(element.project).fileIndex.getModuleForFile(element.containingFile.originalFile.virtualFile)
+
+    return if (elementType == null) emptyList() else datatableFields(module!!, elementType, ColumnName())
 }
 
-fun datatableFields(classField: PsiClass, parentName: ColumnName): List<DataTablePsiField> {
+fun datatableFields(module: Module, classField: PsiClass, parentName: ColumnName): List<DataTablePsiField> {
     if (!hasDataTableWithHeaderAnnotation(classField)) {
         return emptyList()
     }
+    val converters = customConverters(module)
     return classField.allFields
             .filter { isADatatableColumn(it) }
             .flatMap {
                 val fieldInfo = fieldInfo(it)
-                if (hasDataTableWithHeaderAnnotation((it.type as PsiClassReferenceType).resolve()!!)) {
-                    datatableFields((it.type as PsiClassReferenceType).resolve()!!, fieldInfo.columnName)
+                val hasConverter = converters.any { converter -> converter.returnType == it.type }
+                if (!hasConverter && hasDataTableWithHeaderAnnotation((it.type as PsiClassReferenceType).resolve()!!)) {
+                    datatableFields(module, (it.type as PsiClassReferenceType).resolve()!!, fieldInfo.columnName)
                 } else {
                     listOf(DataTablePsiField(it, parentName.addChild(fieldInfo.columnName), fieldInfo.description))
                 }
             }
 }
 
-class DataTablePsiField(val psiField: PsiField, val name: ColumnName, val description: String?) {
+fun customConverters(module: Module): List<TypeMapper> {
+    val globalScopeSearch = module.getModuleWithDependenciesAndLibrariesScope(true)
+    val fieldMapperClass = JavaPsiFacade.getInstance(module.project).findClass(CustomDatatableFieldMapper::class.qualifiedName!!, globalScopeSearch)
+    if (fieldMapperClass != null) {
+        val mappers = AnnotatedElementsSearch.searchPsiMethods(fieldMapperClass, globalScopeSearch)
+        return mappers.map {
+            TypeMapper(
+                it,
+                annotationParamValue(it, CustomDatatableFieldMapper::class, "sample").firstOrNull(),
+                annotationParamValue(it, CustomDatatableFieldMapper::class, "typeDescription").firstOrNull()
+            )
+        }
+    }
+    return emptyList()
+}
 
+class DataTablePsiField(val psiField: PsiField, val name: ColumnName, val description: String?)
+
+class TypeMapper(val psiMethod: PsiMethod, val sample: String?, val typeDescription: String?) {
+    val returnType = psiMethod.returnType
 }

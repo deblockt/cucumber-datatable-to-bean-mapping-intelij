@@ -5,24 +5,28 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Cucumber-datatable-to-bean-mapping-intelij-plugin</name>
+    <name>Cucumber DataTable Mapping</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="deblock.thomas.62@gmail.com">Deblock Thomas</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    This plugin add support of library <a href="https://github.com/deblockt/cucumber-datatable-to-bean-mapping?tab=readme-ov-file#cucumber-datatable-to-bean-mapping">cucumber-datatable-to-bean-mapping</a>.
+    <ul>
+        <li>datatable column autocompletion.</li>
+        <li>datatable column reference. CTRL + click on header to go to field definition.</li>
+        <li>datatable error lint when a column is not referenced on the bean.</li>
+    </ul>
   ]]></description>
-    <depends>gherkin</depends>
 
     <!-- Product and plugin compatibility requirements.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
+    <depends>gherkin</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->

@@ -16,9 +16,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import kotlin.reflect.KClass
 
 fun isADatatableColumn(field: PsiField): Boolean {
-    if (options().fieldResolverClass.equals(ImplicitFieldResolver::class)) {
+    if (options().fieldResolverClass == ImplicitFieldResolver::class.java) {
         return field.annotations
-                .count { it.qualifiedName !== Ignore::class.qualifiedName } == 0
+                .count { it.qualifiedName == Ignore::class.qualifiedName } == 0
     }
     return field.annotations
                 .count { it.qualifiedName == Column::class.qualifiedName } > 0
@@ -53,7 +53,7 @@ fun fieldInfo(field: PsiField): FieldInfo {
     val defaultValue = annotationParamValue(field, Column::class, "defaultValue")
     val mandatory = annotationParamValue(field, Column::class, "mandatory")
     val optionalBoolean = if (mandatory.isEmpty()) {
-        options().fieldResolverClass.equals(ImplicitFieldResolver::class)
+        options().fieldResolverClass == ImplicitFieldResolver::class.java
     } else {
         mandatory.first() == "false"
     }

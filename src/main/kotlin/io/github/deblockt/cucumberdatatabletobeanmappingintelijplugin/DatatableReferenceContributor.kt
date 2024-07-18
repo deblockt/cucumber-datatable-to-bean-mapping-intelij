@@ -8,7 +8,6 @@ import org.jetbrains.plugins.cucumber.psi.GherkinTokenTypes
 
 class DatatableReferenceContributor: PsiReferenceContributor() {
     override fun registerReferenceProviders(registrar: PsiReferenceRegistrar) {
-        println("ON EST ICICICICIC")
         registrar.registerReferenceProvider(
                 IS_HEADER_CELL,
                 HeaderColumnReferenceProvider()

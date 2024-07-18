@@ -99,13 +99,16 @@ fun datatableFields(module: Module, classField: PsiClass, parentName: ColumnName
     if (!hasDataTableWithHeaderAnnotation(classField)) {
         return emptyList()
     }
-    val converters = customConverters(module)
+    val customConverters = customConverters(module)
     return classField.allFields
             .filter { isADatatableColumn(it) }
             .flatMap {
                 val fieldInfo = fieldInfo(it)
-                val hasConverter = converters.any { converter -> converter.returnType == it.type }
-                if (!hasConverter && hasDataTableWithHeaderAnnotation((it.type as PsiClassReferenceType).resolve()!!)) {
+                val hasConverter = customConverters.any { converter -> converter.returnType == it.type }
+                val isNestedDataTableObject = !hasConverter
+                        && it.type is PsiClassReferenceType
+                        && hasDataTableWithHeaderAnnotation((it.type as PsiClassReferenceType).resolve()!!)
+                if (isNestedDataTableObject) {
                     datatableFields(module, (it.type as PsiClassReferenceType).resolve()!!, fieldInfo.columnName)
                 } else {
                     listOf(DataTablePsiField(it, parentName.addChild(fieldInfo.columnName), fieldInfo.description))

@@ -9,7 +9,10 @@ This plugin brings:
 
 ## Installation
 
-To install this plugin:
+This plugin is available on the [Jetbrains Marketplace: Cucumber DataTable Mapping](https://plugins.jetbrains.com/plugin/24873-cucumber-datatable-mapping).
+
+You can also install the plugin without using the Marketplace:
+
 - Download the zip from the [release page](https://github.com/deblockt/cucumber-datatable-to-bean-mapping-intelij/releases).
 - Go to InteliJ Settings > plugins > Install plugin from disk
 - Select the downloaded zip

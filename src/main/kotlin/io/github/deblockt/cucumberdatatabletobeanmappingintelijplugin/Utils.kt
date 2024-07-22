@@ -16,7 +16,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import kotlin.reflect.KClass
 
 fun isADatatableColumn(field: PsiField): Boolean {
-    if (options().fieldResolverClass == ImplicitFieldResolver::class.java) {
+    if (options(field).fieldResolverClass == ImplicitFieldResolver::class.java) {
         return field.annotations
                 .count { it.qualifiedName == Ignore::class.qualifiedName } == 0
     }
@@ -24,7 +24,10 @@ fun isADatatableColumn(field: PsiField): Boolean {
                 .count { it.qualifiedName == Column::class.qualifiedName } > 0
 }
 
-fun hasDataTableWithHeaderAnnotation(classField: PsiClass): Boolean {
+fun hasDataTableWithHeaderAnnotation(classField: PsiClass?): Boolean {
+    if (classField == null) {
+        return false;
+    }
     return classField.annotations
             .count { it.qualifiedName == DataTableWithHeader::class.qualifiedName } > 0
 }
@@ -48,12 +51,12 @@ fun annotationParamValue(field: PsiJvmModifiersOwner, type: KClass<out Any>, par
 
 fun fieldInfo(field: PsiField): FieldInfo {
     val annotationNames = annotationParamValue(field, Column::class, "value", true)
-    val names = annotationNames.ifEmpty { nameResolver(options()).build(field.name) }
+    val names = annotationNames.ifEmpty { nameResolver(options(field)).build(field.name) }
     val description = annotationParamValue(field, Column::class, "description")
     val defaultValue = annotationParamValue(field, Column::class, "defaultValue")
     val mandatory = annotationParamValue(field, Column::class, "mandatory")
     val optionalBoolean = if (mandatory.isEmpty()) {
-        options().fieldResolverClass == ImplicitFieldResolver::class.java
+        options(field).fieldResolverClass == ImplicitFieldResolver::class.java
     } else {
         mandatory.first() == "false"
     }
@@ -83,7 +86,7 @@ fun datatableClass(element: PsiElement): PsiClass? {
     } else {
         paramterizedType.typeArguments.first() as PsiClassReferenceType
     }
-    if (clazz.resolve() != null && hasDataTableWithHeaderAnnotation(clazz.resolve()!!)) {
+    if (hasDataTableWithHeaderAnnotation(clazz.resolve())) {
         return clazz.resolve()
     }
     return null
@@ -107,7 +110,7 @@ fun datatableFields(module: Module, classField: PsiClass, parentName: ColumnName
                 val hasConverter = customConverters.any { converter -> converter.returnType == it.type }
                 val isNestedDataTableObject = !hasConverter
                         && it.type is PsiClassReferenceType
-                        && hasDataTableWithHeaderAnnotation((it.type as PsiClassReferenceType).resolve()!!)
+                        && hasDataTableWithHeaderAnnotation((it.type as PsiClassReferenceType).resolve())
                 if (isNestedDataTableObject) {
                     datatableFields(module, (it.type as PsiClassReferenceType).resolve()!!, fieldInfo.columnName)
                 } else {

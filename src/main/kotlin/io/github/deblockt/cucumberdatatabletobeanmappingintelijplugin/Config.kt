@@ -6,14 +6,15 @@ import com.deblock.cucumber.datatable.backend.options.MergedOptions
 import com.deblock.cucumber.datatable.backend.options.PropertiesOptions
 import com.deblock.cucumber.datatable.mapper.name.ColumnNameBuilder
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.psi.PsiField
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.search.EverythingGlobalScope
 import com.intellij.psi.search.FilenameIndex
 import java.io.ByteArrayInputStream
 import java.util.*
 
-fun options(field: PsiField): FullOptions {
-    val module = ProjectRootManager.getInstance(field.project).fileIndex.getModuleForFile(field.containingFile.originalFile.virtualFile)
+fun options(file: PsiFile): FullOptions {
+    val module = ProjectRootManager.getInstance(file.project).fileIndex.getModuleForFile(file.originalFile.virtualFile)
     val scope = module?.moduleWithDependentsScope ?: EverythingGlobalScope()
     val files = FilenameIndex.getVirtualFilesByName("cucumber.properties", scope)
     if (files.isNotEmpty()) {
@@ -24,11 +25,15 @@ fun options(field: PsiField): FullOptions {
             map[key as String] = value as String
         }
         return MergedOptions(
-                PropertiesOptions(map),
-                DefaultOptions()
+            PropertiesOptions(map),
+            DefaultOptions()
         )
     }
     return DefaultOptions()
+}
+
+fun options(field: PsiElement): FullOptions {
+    return options(field.containingFile)
 }
 
 val cache = HashMap<String, Any>()

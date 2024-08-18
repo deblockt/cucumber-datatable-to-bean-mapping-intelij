@@ -38,5 +38,6 @@
                 language="Gherkin"
                 implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DataTableCompletionContributor"/>
         <psi.referenceContributor language="Gherkin" implementation="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DatatableReferenceContributor" />
+        <lang.findUsagesProvider language="Gherkin" implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableFindUsageProvider"/>
     </extensions>
 </idea-plugin>

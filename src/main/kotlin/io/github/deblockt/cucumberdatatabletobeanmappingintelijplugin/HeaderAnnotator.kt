@@ -5,8 +5,13 @@ import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
+import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.CreateFieldFromColumnHeader
+import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.RenameColumnHeader
+import org.apache.commons.text.similarity.LevenshteinDistance
 
 class HeaderAnnotator: Annotator {
+    private val levenshtein = LevenshteinDistance()
+
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
         if (!IS_HEADER_CELL.accepts(element) || datatableClass(element) == null) {
             return;
@@ -16,13 +21,18 @@ class HeaderAnnotator: Annotator {
         val numberOfMatch = fields
                 .flatMap { it.name }
                 .count { it == headerContent }
+
         if (numberOfMatch == 0) {
-            holder.newAnnotation(HighlightSeverity.ERROR, "Unresolved header name")
+            val bestHeaderMatch = fields
+                .flatMap { it.name }
+                .sortedBy { levenshtein.apply(it, headerContent) }
+                .first()
+
+            holder.newAnnotation(HighlightSeverity.ERROR, CucumberDatatableBundle.message("annotation.unresolved.header.text"))
                     .range(element.textRange)
                     .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
-                    // ** Tutorial step 19. - Add a quick fix for the string containing possible properties
-                    //.withFix(CustomFix(element, "new name"))
-                    //.withFix()
+                    .withFix(CreateFieldFromColumnHeader(element))
+                    .withFix(RenameColumnHeader(element, bestHeaderMatch))
                     .create();
         }
     }

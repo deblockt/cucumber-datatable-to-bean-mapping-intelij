@@ -68,7 +68,7 @@ class CreateFieldFromColumnHeader(columnHeader: PsiElement): BaseIntentionAction
                             """
                                 ${if (needColumnAnnotation) "@com.deblock.cucumber.datatable.annotations.Column" else ""}
                                 $modifier String $fieldName;
-                            """.trimIndent(),
+                            """.trimIndent().trim(),
                             classToUpdate
                         )
                         if (needColumnAnnotation) {

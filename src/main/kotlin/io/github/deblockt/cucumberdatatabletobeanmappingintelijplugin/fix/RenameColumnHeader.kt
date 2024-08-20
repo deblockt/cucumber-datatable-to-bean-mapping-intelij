@@ -12,18 +12,18 @@ import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDa
 import org.jetbrains.plugins.cucumber.CucumberElementFactory
 import org.jetbrains.plugins.cucumber.psi.GherkinTableCellImpl
 
-class RenameColumnHeader(private val columnHeader: PsiElement, private val newName: String): BaseIntentionAction() {
+class RenameColumnHeader(private val columnHeader: PsiElement, private val newName: String?): BaseIntentionAction() {
 
     override fun getFamilyName(): String {
         return CucumberDatatableBundle.message("intention.rename.column.family")
     }
 
     override fun getText(): String {
-        return CucumberDatatableBundle.message("intention.rename.column.text", newName)
+        return CucumberDatatableBundle.message("intention.rename.column.text", newName!!)
     }
 
     override fun isAvailable(project: Project, editor: Editor?, psiFile: PsiFile?): Boolean {
-        return true
+        return newName !== null
     }
 
     override fun invoke(project: Project, editor: Editor?, psiFile: PsiFile?) {

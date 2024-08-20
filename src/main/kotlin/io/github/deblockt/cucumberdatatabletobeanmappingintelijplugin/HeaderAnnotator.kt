@@ -26,7 +26,7 @@ class HeaderAnnotator: Annotator {
             val bestHeaderMatch = fields
                 .flatMap { it.name }
                 .sortedBy { levenshtein.apply(it, headerContent) }
-                .first()
+                .firstOrNull()
 
             holder.newAnnotation(HighlightSeverity.ERROR, CucumberDatatableBundle.message("annotation.unresolved.header.text"))
                     .range(element.textRange)

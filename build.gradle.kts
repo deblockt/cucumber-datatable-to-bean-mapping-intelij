@@ -43,6 +43,7 @@ intellij {
 dependencies {
     implementation("io.github.deblockt:cucumber-datatable-to-bean-mapping:1.1.0")
     implementation("io.cucumber:cucumber-core:7.8.1")
+    implementation("org.apache.commons:commons-text:1.12.0")
 }
 
 tasks {

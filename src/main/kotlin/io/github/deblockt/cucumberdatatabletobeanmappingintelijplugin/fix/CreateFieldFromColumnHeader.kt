@@ -83,7 +83,7 @@ class CreateFieldFromColumnHeader(columnHeader: PsiElement): BaseIntentionAction
                             .filter { method -> method.containingClass == classToUpdate }
                             .lastOrNull { method -> method.name.startsWith("get") || method.name.startsWith("set") }
 
-                        if (lastGetterSetter != null) {
+                        if (lastGetterSetter != null && lastGetterSetter.isPhysical) {
                             val getterToAdd = parser.createMethodFromText("""
                                 public String get${fieldName[0].uppercase()}${fieldName.substring(1)}() {
                                     return $fieldName;

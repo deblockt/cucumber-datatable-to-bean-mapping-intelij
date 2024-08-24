@@ -9,7 +9,7 @@ import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.Create
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.RenameColumnHeader
 import org.apache.commons.text.similarity.LevenshteinDistance
 
-class HeaderAnnotator: Annotator {
+class UnresolvedHeaderNameAnnotator: Annotator {
     private val levenshtein = LevenshteinDistance()
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {

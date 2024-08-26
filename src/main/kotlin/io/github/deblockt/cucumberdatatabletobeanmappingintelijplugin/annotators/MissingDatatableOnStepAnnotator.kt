@@ -25,7 +25,7 @@ class MissingDatatableOnStepAnnotator: Annotator {
         }
         val numberOfStepParameters = numberOfStepParameter(stepDefinition.cucumberRegex!!)
         val methodNumberOfParams = stepDefinition.variableNames.size
-        if (numberOfStepParameters == -1 || methodNumberOfParams >= numberOfStepParameters + 1) {
+        if (methodNumberOfParams >= numberOfStepParameters + 1) {
             return
         }
 

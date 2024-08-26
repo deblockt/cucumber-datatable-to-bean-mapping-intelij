@@ -34,10 +34,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <annotator
                 language="Gherkin"
-                implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.UnresolvedHeaderNameAnnotator"/>
+                implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.annotators.UnresolvedHeaderNameAnnotator"/>
         <annotator
                 language="Gherkin"
-                implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.MissingDatatableOnStepAnnotator"/>
+                implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.annotators.MissingDatatableOnStepAnnotator"/>
         <completion.contributor
                 language="Gherkin"
                 implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DataTableCompletionContributor"/>

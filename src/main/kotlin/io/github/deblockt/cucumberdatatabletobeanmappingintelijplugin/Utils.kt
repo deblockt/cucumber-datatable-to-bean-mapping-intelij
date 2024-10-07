@@ -32,7 +32,7 @@ fun hasDataTableWithHeaderAnnotation(classField: PsiClass?): Boolean {
             .count { it.qualifiedName == DataTableWithHeader::class.qualifiedName } > 0
 }
 
-fun annotationParamValue(field: PsiJvmModifiersOwner, type: KClass<out Any>, paramName: String, isDefaultParam: Boolean = false): List<String> {
+fun annotationParamValue(field: PsiModifierListOwner, type: KClass<out Any>, paramName: String, isDefaultParam: Boolean = false): List<String> {
     return field.annotations
             .asSequence()
             .filter { it.qualifiedName == type.qualifiedName }
@@ -68,15 +68,7 @@ fun fieldInfo(field: PsiField): FieldInfo {
     )
 }
 
-fun datatableClass(element: PsiElement): PsiClass? {
-    val step = PsiTreeUtil.getParentOfType(element,org.jetbrains.plugins.cucumber.psi.impl.GherkinStepImpl::class.java)
-            ?: return null;
-    val reference = step.references[0] as PsiPolyVariantReference
-    val results = reference.multiResolve(true)
-    if (results.isEmpty()) {
-        return null
-    }
-    val methodRef = results[0].element
+fun datatableClass(methodRef: PsiMethod): PsiClass? {
     val parameters = PsiTreeUtil.findChildOfType(methodRef, PsiParameterList::class.java)
     val lastParameter = PsiTreeUtil.getChildrenOfType(parameters, PsiParameter::class.java)?.last()
     val lastParameterType = PsiTreeUtil.findChildOfType(lastParameter, PsiTypeElement::class.java)
@@ -91,6 +83,19 @@ fun datatableClass(element: PsiElement): PsiClass? {
     }
     return null
 }
+
+fun datatableClass(element: PsiElement): PsiClass? {
+    val step = PsiTreeUtil.getParentOfType(element,org.jetbrains.plugins.cucumber.psi.impl.GherkinStepImpl::class.java)
+            ?: return null;
+    val reference = step.references[0] as PsiPolyVariantReference
+    val results = reference.multiResolve(true)
+    if (results.isEmpty()) {
+        return null
+    }
+    val methodRef = results[0].element as? PsiMethod ?: return null
+    return datatableClass(methodRef)
+}
+
 fun datatableFields(element: PsiElement): List<DataTablePsiField> {
     val elementType = datatableClass(element)
     val module = ProjectRootManager.getInstance(element.project).fileIndex.getModuleForFile(element.containingFile.originalFile.virtualFile)

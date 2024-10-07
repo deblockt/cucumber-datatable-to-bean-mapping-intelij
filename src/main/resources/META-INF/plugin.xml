@@ -41,6 +41,11 @@
         <completion.contributor
                 language="Gherkin"
                 implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DataTableCompletionContributor"/>
+        <useScopeEnlarger
+                implementation="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.WithCucumberFileScopesEnlarger"/>
         <psi.referenceContributor language="Gherkin" implementation="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DatatableReferenceContributor" />
+        <referencesSearch implementation="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableJavaFieldDefinitionSearch"/>
+        <lang.elementManipulator forClass="org.jetbrains.plugins.cucumber.psi.GherkinTableCell"
+                                 implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.RowHeaderElementManipulator"/>
     </extensions>
 </idea-plugin>

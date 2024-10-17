@@ -24,7 +24,6 @@ class WithCucumberFileScopesEnlarger: UseScopeEnlarger() {
         val module = ProjectRootManager.getInstance(myElement.project).fileIndex.getModuleForFile(myElement.containingFile.originalFile.virtualFile)
         val scope = module?.moduleWithDependentsScope ?: return null
 
-        log.warn("Return new scope with gherkins file for field ${myElement.text}")
         return GlobalSearchScope.getScopeRestrictedByFileTypes(scope, GherkinFileType.INSTANCE)
     }
 }

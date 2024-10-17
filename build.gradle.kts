@@ -30,12 +30,12 @@ repositories {
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
-    version.set("2023.3.2")
+    version.set("2024.2.0.1")
     type.set("IC") // Target IDE Platform
 
     plugins.set(listOf(
-            "gherkin:233.11799.165",
-            "cucumber-java:233.11799.196",
+            "gherkin:242.20224.159",
+            "cucumber-java:242.20224.159",
             "java:"
     ))
 }
@@ -58,7 +58,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("233")
-        untilBuild.set("242.*")
+        untilBuild.set("243.*")
     }
 
     signPlugin {

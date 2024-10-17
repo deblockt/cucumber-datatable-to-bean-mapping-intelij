@@ -1,15 +1,19 @@
-package io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin
+package io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.annotators
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
+import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableBundle
+import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.IS_HEADER_CELL
+import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.datatableClass
+import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.datatableFields
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.CreateFieldFromColumnHeader
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.RenameColumnHeader
 import org.apache.commons.text.similarity.LevenshteinDistance
 
-class HeaderAnnotator: Annotator {
+class UnresolvedHeaderNameAnnotator: Annotator {
     private val levenshtein = LevenshteinDistance()
 
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
@@ -28,7 +32,9 @@ class HeaderAnnotator: Annotator {
                 .sortedBy { levenshtein.apply(it, headerContent) }
                 .firstOrNull()
 
-            holder.newAnnotation(HighlightSeverity.ERROR, CucumberDatatableBundle.message("annotation.unresolved.header.text"))
+            holder.newAnnotation(HighlightSeverity.ERROR,
+                CucumberDatatableBundle.message("annotation.unresolved.header.text")
+            )
                     .range(element.textRange)
                     .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
                     .withFix(CreateFieldFromColumnHeader(element))

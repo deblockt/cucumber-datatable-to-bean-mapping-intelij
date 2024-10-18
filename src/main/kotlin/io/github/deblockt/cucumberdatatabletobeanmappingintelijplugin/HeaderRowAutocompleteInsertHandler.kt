@@ -8,7 +8,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.endOffset
 import org.jetbrains.plugins.cucumber.psi.GherkinTable
 
 class HeaderRowAutocompleteInsertHandler: InsertHandler<LookupElement> {
@@ -40,7 +39,7 @@ class HeaderRowAutocompleteInsertHandler: InsertHandler<LookupElement> {
         table?.dataRows?.forEach {
             val endOffset =
                 if (it.psiCells.size < headerCell) {
-                    it.endOffset
+                    it.textRange.endOffset
                 } else {
                     it.psiCells[headerCell - 1].textOffset
                 }

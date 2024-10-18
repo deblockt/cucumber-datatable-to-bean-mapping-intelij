@@ -16,7 +16,7 @@ class HeaderRowAutocompleteInsertHandler: InsertHandler<LookupElement> {
     override fun handleInsert(context: InsertionContext, element: LookupElement) {
         val cell = context.file.findElementAt(context.startOffset)?.parent
         if (cell != null) {
-            val hasTextAfterAutocomplete = cell.text.replace(element.lookupString, "").trim().length > 1
+            val hasTextAfterAutocomplete = cell.text.replace(element.lookupString, "").trim().isNotEmpty()
             val nextSibling = findNextNonSpaceSibling(cell)
             val table = PsiTreeUtil.getParentOfType(cell, GherkinTable::class.java)
 
@@ -24,19 +24,27 @@ class HeaderRowAutocompleteInsertHandler: InsertHandler<LookupElement> {
                 insertPipe(context.selectionEndOffset, context)
 
                 val headerCell = getHeaderIndex(cell)
-                table?.dataRows?.forEach {
-                    val endOffset =
-                        if (it.psiCells.size < headerCell) {
-                            it.endOffset
-                        } else {
-                            it.psiCells[headerCell - 1].textOffset
-                        }
-                    insertPipe(endOffset, context)
-                }
+                addColumnOnEachRow(table, headerCell, context)
 
                 PsiDocumentManager.getInstance(context.project).commitDocument(context.editor.document)
             }
             table?.replace(CodeStyleManager.getInstance(context.project).reformat(table))
+        }
+    }
+
+    private fun addColumnOnEachRow(
+        table: GherkinTable?,
+        headerCell: Int,
+        context: InsertionContext
+    ) {
+        table?.dataRows?.forEach {
+            val endOffset =
+                if (it.psiCells.size < headerCell) {
+                    it.endOffset
+                } else {
+                    it.psiCells[headerCell - 1].textOffset
+                }
+            insertPipe(endOffset, context)
         }
     }
 

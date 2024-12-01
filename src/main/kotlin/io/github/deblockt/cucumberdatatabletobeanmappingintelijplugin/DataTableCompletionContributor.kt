@@ -19,18 +19,21 @@ class DataTableCompletionContributor: CompletionContributor() {
                 object : CompletionProvider<CompletionParameters>() {
                     override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, resultSet: CompletionResultSet) {
                         datatableFields(parameters.position)
-                                .map {
-                                    val element = LookupElementBuilder.create(it.name.firstName())
-                                        .withInsertHandler(HeaderRowAutocompleteInsertHandler())
-                                    if (it.description !== null) {
-                                        element
-                                                .appendTailText(" ${it.description}", false)
-                                    } else {
-                                        element
-                                    }
-                                }
+                                .flatMap { createElementsForEachName(it) }
                                 .forEach { resultSet.addElement(it) }
                     }
+
+                    private fun createElementsForEachName(datatableField: DataTablePsiField) =
+                        datatableField.name.map { name ->
+                            val element = LookupElementBuilder.create(name)
+                                .withInsertHandler(HeaderRowAutocompleteInsertHandler())
+                            if (datatableField.description !== null) {
+                                element
+                                    .appendTailText(" ${datatableField.description}", false)
+                            } else {
+                                element
+                            }
+                        }
                 }
         )
     }

@@ -17,34 +17,40 @@ class HeaderRowAutocompleteInsertHandler: InsertHandler<LookupElement> {
         if (cell != null) {
             val hasTextAfterAutocomplete = cell.text.replace(element.lookupString, "").trim().isNotEmpty()
             val nextSibling = findNextNonSpaceSibling(cell)
-            val table = PsiTreeUtil.getParentOfType(cell, GherkinTable::class.java)
 
             if (nextSibling == null || hasTextAfterAutocomplete) {
                 insertPipe(context.selectionEndOffset, context)
-
-                val headerCell = getHeaderIndex(cell)
-                addColumnOnEachRow(table, headerCell, context)
-
                 PsiDocumentManager.getInstance(context.project).commitDocument(context.editor.document)
             }
+
+            val headerCell = getHeaderIndex(cell)
+            val table = PsiTreeUtil.getParentOfType(cell, GherkinTable::class.java)
+            addMissingColumnOnEachRow(table, headerCell, context)
+
+            PsiDocumentManager.getInstance(context.project).commitDocument(context.editor.document)
+
             table?.replace(CodeStyleManager.getInstance(context.project).reformat(table))
         }
     }
 
-    private fun addColumnOnEachRow(
+    private fun addMissingColumnOnEachRow(
         table: GherkinTable?,
         headerCell: Int,
         context: InsertionContext
     ) {
-        table?.dataRows?.forEach {
-            val endOffset =
-                if (it.psiCells.size < headerCell) {
-                    it.textRange.endOffset
-                } else {
-                    it.psiCells[headerCell - 1].textOffset
-                }
-            insertPipe(endOffset, context)
-        }
+        val headerColumnNumber = table?.headerRow?.psiCells?.size ?: 0;
+
+        table?.dataRows
+            ?.filter { it.psiCells.size < headerColumnNumber  }
+            ?.forEachIndexed { index, it ->
+                val endOffset =
+                    if (it.psiCells.size < headerCell) {
+                        it.textRange.endOffset
+                    } else {
+                        it.psiCells[headerCell - 1].textOffset
+                    }
+                insertPipe(endOffset + index, context)
+            }
     }
 
     private fun insertPipe(offset: Int, context: InsertionContext) {

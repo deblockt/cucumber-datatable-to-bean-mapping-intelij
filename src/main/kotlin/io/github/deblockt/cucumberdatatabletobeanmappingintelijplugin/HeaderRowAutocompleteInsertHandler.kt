@@ -41,7 +41,7 @@ class HeaderRowAutocompleteInsertHandler: InsertHandler<LookupElement> {
         val headerColumnNumber = table?.headerRow?.psiCells?.size ?: 0;
 
         table?.dataRows
-            ?.filter { it.psiCells.size != headerColumnNumber  }
+            ?.filter { it.psiCells.size < headerColumnNumber  }
             ?.forEachIndexed { index, it ->
                 val endOffset =
                     if (it.psiCells.size < headerCell) {

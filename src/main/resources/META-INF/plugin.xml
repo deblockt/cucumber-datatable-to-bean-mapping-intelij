@@ -38,6 +38,9 @@
         <annotator
                 language="Gherkin"
                 implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.annotators.MissingDatatableOnStepAnnotator"/>
+        <annotator
+                language="Gherkin"
+                implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.annotators.MissingMandatoryColumnAnnotator"/>
         <completion.contributor
                 language="Gherkin"
                 implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DataTableCompletionContributor"/>

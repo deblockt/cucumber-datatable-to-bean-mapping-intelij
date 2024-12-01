@@ -119,7 +119,7 @@ fun datatableFields(module: Module, classField: PsiClass, parentName: ColumnName
                 if (isNestedDataTableObject) {
                     datatableFields(module, (it.type as PsiClassReferenceType).resolve()!!, fieldInfo.columnName)
                 } else {
-                    listOf(DataTablePsiField(it, parentName.addChild(fieldInfo.columnName), fieldInfo.description))
+                    listOf(DataTablePsiField(it, parentName.addChild(fieldInfo.columnName), fieldInfo.description, fieldInfo.optional))
                 }
             }
 }
@@ -140,7 +140,7 @@ fun customConverters(module: Module): List<TypeMapper> {
     return emptyList()
 }
 
-class DataTablePsiField(val psiField: PsiField, val name: ColumnName, val description: String?)
+class DataTablePsiField(val psiField: PsiField, val name: ColumnName, val description: String?, val optional: Boolean)
 
 class TypeMapper(val psiMethod: PsiMethod, val sample: String?, val typeDescription: String?) {
     val returnType = psiMethod.returnType

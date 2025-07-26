@@ -1,7 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.21"
-    id("org.jetbrains.intellij") version "1.16.1"
+    id("org.jetbrains.kotlin.jvm") version "2.1.0"
+    id("org.jetbrains.intellij.platform") version "2.6.0"
     id("me.qoomon.git-versioning") version "6.3.6"
 }
 
@@ -25,25 +27,29 @@ gitVersioning.apply {
 
 repositories {
     mavenCentral()
-}
-
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2025.1.4.1")
-    type.set("IC") // Target IDE Platform
-
-    plugins.set(listOf(
-            "gherkin:251.23774.318",
-            "cucumber-java:251.23774.318",
-            "java:"
-    ))
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     implementation("io.github.deblockt:cucumber-datatable-to-bean-mapping:1.1.0")
     implementation("io.cucumber:cucumber-core:7.8.1")
     implementation("org.apache.commons:commons-text:1.12.0")
+
+    intellijPlatform {
+        intellijIdeaCommunity("2025.1.4.1")
+
+        bundledPlugin("com.intellij.java")
+        plugin("gherkin", "251.23774.318")
+        plugin("cucumber-java", "251.23774.318")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("17")
+    }
 }
 
 tasks {
@@ -52,13 +58,10 @@ tasks {
         sourceCompatibility = "17"
         targetCompatibility = "17"
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
 
     patchPluginXml {
-        sinceBuild.set("252.23591")
-        untilBuild.set("252.*")
+        sinceBuild.set("251.27812")
+        untilBuild.set("251.*")
     }
 
     signPlugin {

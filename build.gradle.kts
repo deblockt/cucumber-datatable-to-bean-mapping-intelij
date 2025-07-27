@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -45,6 +47,22 @@ dependencies {
         plugin("cucumber-java", "251.23774.318")
     }
 }
+
+intellijPlatform {
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.IntellijIdeaCommunity, "2025.1")
+            recommended()
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdeaCommunity)
+                channels = listOf(ProductRelease.Channel.RELEASE)
+                sinceBuild = "251.23774"
+                untilBuild = "*"
+            }
+        }
+    }
+}
+
 
 kotlin {
     compilerOptions {

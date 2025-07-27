@@ -1,8 +1,10 @@
-name: Plugin Verification
+name: Compatibility Verification
 
 on:
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '0 3 * * 1'
 
 jobs:
   verify:
@@ -20,11 +22,12 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build plugin
-        run: ./gradlew buildPlugin
+      - name: Verify plugin
+        run: ./gradlew verifyPlugin
 
-      - name: Run IntelliJ Plugin Verifier
-        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
+      - name: Upload Plugin Verifier Report
+        uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          ide-versions: |
-            ideaIC:2025.1
+          name: plugin-verifier-report
+          path: build/reports/pluginVerifier

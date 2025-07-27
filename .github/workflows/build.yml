@@ -27,6 +27,16 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew buildPlugin
 
+      - name: Verify plugin
+        run: ./gradlew verifyPlugin
+
+      - name: Upload Plugin Verifier Report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: plugin-verifier-report
+          path: build/reports/pluginVerifier
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:

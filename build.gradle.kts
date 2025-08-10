@@ -40,11 +40,11 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
 
     intellijPlatform {
-        intellijIdeaCommunity("2025.1.4.1")
+        intellijIdeaCommunity("2025.2")
 
         bundledPlugin("com.intellij.java")
-        plugin("gherkin", "251.23774.318")
-        plugin("cucumber-java", "251.23774.318")
+        plugin("gherkin", "252.23892.201")
+        plugin("cucumber-java", "252.23892.360")
     }
 }
 
@@ -79,7 +79,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("251.27812")
-        untilBuild.set("251.*")
+        untilBuild.set("252.*")
     }
 
     signPlugin {

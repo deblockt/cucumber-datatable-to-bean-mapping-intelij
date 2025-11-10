@@ -50,5 +50,7 @@
         <referencesSearch implementation="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableJavaFieldDefinitionSearch"/>
         <lang.elementManipulator forClass="org.jetbrains.plugins.cucumber.psi.GherkinTableCell"
                                  implementationClass="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.RowHeaderElementManipulator"/>
+        <refactoring.safeDeleteProcessor
+                implementation="io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.DatatableFieldSafeDeleteProcessor"/>
     </extensions>
 </idea-plugin>

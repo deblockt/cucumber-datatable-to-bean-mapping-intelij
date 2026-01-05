@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
-    id("org.jetbrains.intellij.platform") version "2.6.0"
+    id("org.jetbrains.intellij.platform") version "2.10.5"
     id("me.qoomon.git-versioning") version "6.3.6"
 }
 
@@ -40,11 +40,11 @@ dependencies {
     implementation("org.apache.commons:commons-text:1.12.0")
 
     intellijPlatform {
-        intellijIdeaCommunity("2025.2")
+        intellijIdea("2025.3")
 
         bundledPlugin("com.intellij.java")
-        plugin("gherkin", "252.23892.201")
-        plugin("cucumber-java", "252.23892.360")
+        plugin("gherkin", "253.28294.218")
+        plugin("cucumber-java", "253.28294.251")
     }
 }
 

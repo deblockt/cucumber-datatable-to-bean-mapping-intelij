@@ -16,5 +16,4 @@ class MyVariantReference(element: PsiElement, rangeInElement: TextRange?, privat
         val resolveResults = multiResolve(false)
         return if (resolveResults.size == 1) resolveResults[0].element else null
     }
-
 }

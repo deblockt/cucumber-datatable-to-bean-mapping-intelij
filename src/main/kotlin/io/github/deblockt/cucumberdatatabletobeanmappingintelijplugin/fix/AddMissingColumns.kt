@@ -13,7 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableBundle
 import org.jetbrains.plugins.cucumber.CucumberElementFactory
 import org.jetbrains.plugins.cucumber.psi.GherkinTable
-import org.jetbrains.plugins.cucumber.psi.GherkinTableCellImpl
+import org.jetbrains.plugins.cucumber.psi.GherkinTableCell
 import org.jetbrains.plugins.cucumber.psi.GherkinTableRow
 
 
@@ -44,7 +44,7 @@ class AddMissingColumns(private val row: GherkinTableRow, private val missingCol
                             |${missingColumns.joinToString("|")}|
                     """.trimIndent()
                 )
-                val newElements = PsiTreeUtil.findChildrenOfType(element, GherkinTableCellImpl::class.java)
+                val newElements = PsiTreeUtil.findChildrenOfType(element, GherkinTableCell::class.java)
                 val pipe = newElements.first().prevSibling
                 newElements.forEach { row.add(it); row.add(it.nextSibling) }
 

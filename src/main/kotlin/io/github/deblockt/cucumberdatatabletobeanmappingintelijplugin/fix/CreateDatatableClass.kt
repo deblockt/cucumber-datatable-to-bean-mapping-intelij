@@ -1,6 +1,5 @@
 package io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix
 
-import ai.grazie.utils.capitalize
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
 import com.intellij.codeInsight.intention.impl.CreateClassDialog
 import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo
@@ -19,6 +18,7 @@ import com.jetbrains.rd.generator.nova.util.decapitalizeInvariant
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableBundle
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.fix.generators.ClassGeneratorInfo
 import org.jetbrains.plugins.cucumber.psi.GherkinTable
+import java.util.Locale.getDefault
 
 class CreateDatatableClass(
     private val datatable: GherkinTable,
@@ -69,7 +69,9 @@ class CreateDatatableClass(
 
         val dialog = CreateClassDialog(
             project,
-            CucumberDatatableBundle.message("intention.create.datatable.class.dialog.header", classGenerator.generator.kind().name.capitalize()),
+            CucumberDatatableBundle.message("intention.create.datatable.class.dialog.header",
+                classGenerator.generator.kind().name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
+            ),
             "CucumberEntry",
             defaultPackage,
             classGenerator.generator.kind(),

@@ -10,7 +10,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin.CucumberDatatableBundle
 import org.jetbrains.plugins.cucumber.CucumberElementFactory
-import org.jetbrains.plugins.cucumber.psi.GherkinTableCellImpl
+import org.jetbrains.plugins.cucumber.psi.GherkinTableCell
 
 class RenameColumnHeader(private val columnHeader: PsiElement, private val newName: String?): BaseIntentionAction() {
 
@@ -36,7 +36,7 @@ class RenameColumnHeader(private val columnHeader: PsiElement, private val newNa
                         Given dummy step
                         | $newName |
                 """.trimIndent())
-                val newElement = PsiTreeUtil.findChildOfType(element, GherkinTableCellImpl::class.java)
+                val newElement = PsiTreeUtil.findChildOfType(element, GherkinTableCell::class.java)
                 columnHeader.replace(newElement!!)
             }
         }

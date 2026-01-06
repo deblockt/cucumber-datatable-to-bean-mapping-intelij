@@ -1,0 +1,47 @@
+name: Verify Plugin (Reusable)
+
+on:
+  workflow_call:
+
+jobs:
+  get-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.get-versions.outputs.versions }}
+    steps:
+      - name: Get IntelliJ versions from 2025.1+
+        id: get-versions
+        run: |
+          versions=$(curl -s "https://data.services.jetbrains.com/products/releases?code=IIC&type=release" \
+            | jq -c '[.IIC[].version | select(. >= "2025.1")] | unique | sort')
+          echo "versions=$versions" >> $GITHUB_OUTPUT
+          echo "Versions to verify: $versions"
+
+  verify:
+    needs: get-versions
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ideVersion: ${{ fromJson(needs.get-versions.outputs.versions) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Verify plugin on IntelliJ ${{ matrix.ideVersion }}
+        run: ./gradlew verifyPlugin -PverifyIdeVersion=${{ matrix.ideVersion }}
+
+      - name: Upload Plugin Verifier Report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: plugin-verifier-report-${{ matrix.ideVersion }}
+          path: build/reports/pluginVerifier

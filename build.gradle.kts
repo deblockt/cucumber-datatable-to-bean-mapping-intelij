@@ -1,5 +1,4 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
-import org.jetbrains.intellij.platform.gradle.models.ProductRelease
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -51,13 +50,12 @@ dependencies {
 intellijPlatform {
     pluginVerification {
         ides {
-            ide(IntelliJPlatformType.IntellijIdeaCommunity, "2025.1")
-            recommended()
-            select {
-                types = listOf(IntelliJPlatformType.IntellijIdeaCommunity)
-                channels = listOf(ProductRelease.Channel.RELEASE)
-                sinceBuild = "251.23774"
-                untilBuild = "*"
+            val verifyIdeVersion = providers.gradleProperty("verifyIdeVersion").orNull
+            if (verifyIdeVersion != null) {
+                ide(IntelliJPlatformType.IntellijIdeaCommunity, verifyIdeVersion)
+            } else {
+                ide(IntelliJPlatformType.IntellijIdeaCommunity, "2025.1")
+                recommended()
             }
         }
     }

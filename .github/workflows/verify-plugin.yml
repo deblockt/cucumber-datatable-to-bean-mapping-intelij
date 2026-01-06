@@ -12,8 +12,8 @@ jobs:
       - name: Get IntelliJ versions from 2025.1+
         id: get-versions
         run: |
-          versions=$(curl -s "https://data.services.jetbrains.com/products/releases?code=IIC&type=release" \
-            | jq -c '[.IIC[].version | select(. >= "2025.1")] | unique | sort')
+          versions=$(curl -s "https://data.services.jetbrains.com/products/releases?code=IU&type=release" \
+            | jq -c '[.IIU[] | select(.version | startswith("2025.")) | {major: (.version | split(".")[0:2] | join(".")), version: .version}] | group_by(.major) | map(.[0].version)')
           echo "versions=$versions" >> $GITHUB_OUTPUT
           echo "Versions to verify: $versions"
 

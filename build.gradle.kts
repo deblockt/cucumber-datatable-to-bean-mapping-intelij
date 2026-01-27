@@ -52,7 +52,7 @@ intellijPlatform {
         ides {
             val verifyIdeVersion = providers.gradleProperty("verifyIdeVersion").orNull
             if (verifyIdeVersion != null) {
-                ide(IntelliJPlatformType.IntellijIdeaCommunity, verifyIdeVersion)
+                ide(IntelliJPlatformType.IntellijIdeaUltimate, verifyIdeVersion)
             } else {
                 ide(IntelliJPlatformType.IntellijIdeaCommunity, "2025.1")
                 recommended()

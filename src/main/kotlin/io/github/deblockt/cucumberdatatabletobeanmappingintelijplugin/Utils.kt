@@ -87,12 +87,8 @@ fun datatableClass(methodRef: PsiMethod): PsiClass? {
 fun datatableClass(element: PsiElement): PsiClass? {
     val step = PsiTreeUtil.getParentOfType(element,org.jetbrains.plugins.cucumber.psi.GherkinStep::class.java)
             ?: return null;
-    val reference = step.references[0] as PsiPolyVariantReference
-    val results = reference.multiResolve(true)
-    if (results.isEmpty()) {
-        return null
-    }
-    val methodRef = stepMethod(results[0].element) ?: return null
+    val stepDefinition = step.findDefinitions().firstOrNull()
+    val methodRef = stepMethod(stepDefinition?.element) ?: return null
     return datatableClass(methodRef)
 }
 

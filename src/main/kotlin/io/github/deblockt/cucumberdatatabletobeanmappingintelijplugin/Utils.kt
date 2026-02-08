@@ -92,12 +92,16 @@ fun datatableClass(element: PsiElement): PsiClass? {
     if (results.isEmpty()) {
         return null
     }
-    val methodRef = when (val resolvedElement = results[0].element) {
-        is PsiMethod -> resolvedElement
-        is PsiAnnotation -> PsiTreeUtil.getParentOfType(resolvedElement, PsiMethod::class.java)
-        else -> null
-    } ?: return null
+    val methodRef = stepMethod(results[0].element) ?: return null
     return datatableClass(methodRef)
+}
+
+fun stepMethod(element: PsiElement?): PsiMethod? {
+    return when (element) {
+        is PsiMethod -> element
+        is PsiAnnotation -> PsiTreeUtil.getParentOfType(element, PsiMethod::class.java)
+        else -> null
+    }
 }
 
 fun datatableFields(element: PsiElement): List<DataTablePsiField> {

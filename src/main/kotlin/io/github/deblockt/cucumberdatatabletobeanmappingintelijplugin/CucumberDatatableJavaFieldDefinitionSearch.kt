@@ -1,8 +1,6 @@
 package io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin
 
 import com.deblock.cucumber.datatable.annotations.Column
-import com.intellij.find.findUsages.JavaFindUsagesHelper
-import com.intellij.find.findUsages.JavaMethodFindUsagesOptions
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.TextRange
@@ -82,14 +80,8 @@ class CucumberDatatableJavaFieldDefinitionSearch :
 
     private fun findGherkinsSteps(method: PsiMethod, scope: SearchScope): List<PsiElement> {
         val gherkinsScope = GlobalSearchScope.getScopeRestrictedByFileTypes(GlobalSearchScope.EMPTY_SCOPE.union(scope), GherkinFileType.INSTANCE)
-        val result = mutableListOf<PsiElement>()
-        JavaFindUsagesHelper.processElementUsages(method, JavaMethodFindUsagesOptions(gherkinsScope)) {
-            if (it.element !== null) {
-                result.add(it.element!!)
-            }
-            true
-        }
-        return result
+        return ReferencesSearch.search(method, gherkinsScope)
+            .mapNotNull { it.element }
     }
 
     private fun containsReference(datatableClass: PsiClass?, searchingClass: PsiClass): Boolean {

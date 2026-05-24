@@ -22,45 +22,43 @@ import org.jetbrains.plugins.cucumber.psi.GherkinTableRow
 class CucumberDatatableJavaFieldDefinitionSearch :
     QueryExecutor<PsiReference?, ReferencesSearch.SearchParameters?> {
 
+    private data class SearchContext(val psiClass: PsiClass, val stepSearchScope: SearchScope)
+
     override fun execute(
         queryParameters: ReferencesSearch.SearchParameters,
         processor: Processor<in PsiReference?>
     ): Boolean {
         val myElement = queryParameters.elementToSearch
         if (myElement !is PsiField && myElement !is PsiRecordComponent) {
-            return true;
+            return true
         }
         val psiNamesElement = myElement as PsiNamedElement
-        val hasNameOverride = ReadAction.compute<Boolean, RuntimeException> {
-            annotationParamValue(myElement as PsiModifierListOwner, Column::class, "value").isNotEmpty()
-        }
-        if (hasNameOverride) {
-            return true
-        }
 
-        val psiClass: PsiClass? = ReadAction.compute<PsiClass?, RuntimeException> { (myElement as PsiMember).containingClass }
-        val isDatatableClass = ReadAction.compute<Boolean, RuntimeException> { hasDataTableWithHeaderAnnotation(psiClass) }
-        if (!isDatatableClass) {
-            return true
-        }
+        val context = ReadAction.nonBlocking<SearchContext?> {
+            val hasNameOverride = annotationParamValue(myElement as PsiModifierListOwner, Column::class, "value").isNotEmpty()
+            if (hasNameOverride) return@nonBlocking null
 
-        val stepSearchScope = ReadAction.compute<SearchScope, RuntimeException> {
-            if (psiNamesElement.containingFile.virtualFile != null) {
-                val module =
-                    ProjectRootManager.getInstance(psiNamesElement.project).fileIndex.getModuleForFile(psiNamesElement.containingFile.virtualFile)
+            val psiClass = (myElement as PsiMember).containingClass ?: return@nonBlocking null
+            if (!hasDataTableWithHeaderAnnotation(psiClass)) return@nonBlocking null
+
+            val stepSearchScope = if (psiNamesElement.containingFile.virtualFile != null) {
+                val module = ProjectRootManager.getInstance(psiNamesElement.project)
+                    .fileIndex.getModuleForFile(psiNamesElement.containingFile.virtualFile)
                 module?.moduleWithDependentsScope ?: EverythingGlobalScope()
             } else {
                 EverythingGlobalScope()
             }
-        }
-        ReadAction.compute<Unit, RuntimeException> {
-            val methods = buildStepDefAnnotations(myElement, stepSearchScope)
-                .flatMap { AnnotatedElementsSearch.searchPsiMethods(it, stepSearchScope) }
+            SearchContext(psiClass, stepSearchScope)
+        }.executeSynchronously() ?: return true
 
-            val stepsMethods = methods.filter { containsReference(datatableClass(it), psiClass!!) }
+        ReadAction.nonBlocking<Unit> {
+            val methods = buildStepDefAnnotations(myElement, context.stepSearchScope)
+                .flatMap { AnnotatedElementsSearch.searchPsiMethods(it, context.stepSearchScope) }
+
+            val stepsMethods = methods.filter { containsReference(datatableClass(it), context.psiClass) }
             val gherkinsSteps = stepsMethods.flatMap { findGherkinsSteps(it, queryParameters.scopeDeterminedByUser) }
             processHeaderReference(gherkinsSteps, myElement, processor)
-        }
+        }.executeSynchronously()
 
         return true
     }

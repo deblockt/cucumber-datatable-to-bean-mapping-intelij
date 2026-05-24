@@ -2,7 +2,10 @@ package io.github.deblockt.cucumberdatatabletobeanmappingintelijplugin
 
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.psi.*
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiField
+import com.intellij.psi.PsiMember
+import com.intellij.psi.PsiRecordComponent
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.UseScopeEnlarger
@@ -13,17 +16,18 @@ class WithCucumberFileScopesEnlarger: UseScopeEnlarger() {
 
     override fun getAdditionalUseScope(myElement: PsiElement): SearchScope? {
         if (myElement !is PsiField && myElement !is PsiRecordComponent) {
-            return null;
-        }
-
-        val psiClass: PsiClass? = ReadAction.compute<PsiClass?, RuntimeException> { (myElement as PsiMember).containingClass }
-        val isDatatableClass = ReadAction.compute<Boolean, RuntimeException> { hasDataTableWithHeaderAnnotation(psiClass) }
-        if (!isDatatableClass) {
             return null
         }
-        val module = ProjectRootManager.getInstance(myElement.project).fileIndex.getModuleForFile(myElement.containingFile.originalFile.virtualFile)
-        val scope = module?.moduleWithDependentsScope ?: return null
 
-        return GlobalSearchScope.getScopeRestrictedByFileTypes(scope, GherkinFileType.INSTANCE)
+        return ReadAction.nonBlocking<SearchScope?> {
+            val psiClass = (myElement as PsiMember).containingClass
+            if (!hasDataTableWithHeaderAnnotation(psiClass)) return@nonBlocking null
+
+            val module = ProjectRootManager.getInstance(myElement.project)
+                .fileIndex.getModuleForFile(myElement.containingFile.originalFile.virtualFile)
+            val scope = module?.moduleWithDependentsScope ?: return@nonBlocking null
+
+            GlobalSearchScope.getScopeRestrictedByFileTypes(scope, GherkinFileType.INSTANCE)
+        }.executeSynchronously()
     }
 }
